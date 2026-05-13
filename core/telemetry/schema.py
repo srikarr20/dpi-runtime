@@ -13,6 +13,7 @@ class ObservabilityMetrics(BaseModel):
     center_of_mass: float
     coherence_width: float
     peak_count: int
+    noise_strength: float = 0.0
 
 
 class TelemetryEvent(BaseModel):
