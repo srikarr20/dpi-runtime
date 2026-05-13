@@ -2,8 +2,22 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+from collections import deque
+
 from core.telemetry.observables import (
     extract_observables
+)
+
+from core.semantic.semantic_classifier import (
+    classify_semantic_state
+)
+
+from core.meta.meta_analyzer import (
+    analyze_detector_behavior
+)
+
+from core.autonomous.governance import (
+    determine_detector_role
 )
 
 from core.session.session import (
@@ -40,21 +54,24 @@ source_field = np.exp(
 )
 
 # ----------------------------------------
-# DETECTOR NETWORK
+# DETECTOR ECOSYSTEM
 # ----------------------------------------
 
 detectors = {
     "A": {
         "noise": 0.05,
-        "role": "stabilizer"
+        "memory": deque(maxlen=5),
+        "semantic_history": []
     },
     "B": {
         "noise": 0.10,
-        "role": "mediator"
+        "memory": deque(maxlen=5),
+        "semantic_history": []
     },
     "C": {
         "noise": 0.15,
-        "role": "explorer"
+        "memory": deque(maxlen=5),
+        "semantic_history": []
     }
 }
 
@@ -64,13 +81,24 @@ history = {
     "C": []
 }
 
+role_history = []
+
 # ----------------------------------------
 # AUTONOMOUS EVOLUTION
 # ----------------------------------------
 
-for step in range(30):
+for step in range(60):
 
     print(f"\nStep {step}")
+
+    # ----------------------------------------
+    # GLOBAL OBSERVABILITY LOAD
+    # ----------------------------------------
+
+    global_load = np.random.uniform(
+        0.8,
+        1.2
+    )
 
     for detector_id in detectors:
 
@@ -110,45 +138,108 @@ for step in range(30):
             "peak_count"
         ]
 
+        detector["memory"].append(
+            peak_count
+        )
+
+        memory_average = np.mean(
+            detector["memory"]
+        )
+
         # ----------------------------------------
-        # AUTONOMOUS ROLE SPECIALIZATION
+        # SEMANTIC STATE
         # ----------------------------------------
 
-        if peak_count < 165:
-
-            detector["role"] = (
-                "stabilizer"
+        semantic_state = (
+            classify_semantic_state(
+                peak_count=peak_count,
+                coherence_width=observables[
+                    "coherence_width"
+                ],
+                intensity_variance=observables[
+                    "intensity_variance"
+                ]
             )
+        )
+
+        detector[
+            "semantic_history"
+        ].append(semantic_state)
+
+        # ----------------------------------------
+        # META STATE
+        # ----------------------------------------
+
+        meta_state = (
+            analyze_detector_behavior(
+                detector[
+                    "semantic_history"
+                ]
+            )
+        )
+
+        # ----------------------------------------
+        # AUTONOMOUS ROLE
+        # ----------------------------------------
+
+        role = (
+            determine_detector_role(
+                meta_state,
+                detector["noise"]
+            )
+        )
+
+        # ----------------------------------------
+        # ROLE-BASED ADAPTATION
+        # ----------------------------------------
+
+        if role == "stabilizer":
 
             detector["noise"] *= 1.01
 
-        elif peak_count < 185:
+        elif role == "explorer":
 
-            detector["role"] = (
-                "mediator"
-            )
+            detector["noise"] *= 0.92
 
-            detector["noise"] *= 0.99
+        elif role == "mediator":
 
-        else:
+            detector["noise"] *= 0.97
 
-            detector["role"] = (
-                "explorer"
-            )
+        elif role == "generalist":
 
-            detector["noise"] *= 0.95
+            detector["noise"] *= 1.00
+
+        # ----------------------------------------
+        # GLOBAL LOAD RESPONSE
+        # ----------------------------------------
+
+        detector["noise"] *= global_load
 
         detector["noise"] = max(
             0.01,
             detector["noise"]
         )
 
-        observables["role"] = (
-            detector["role"]
+        observables["semantic_state"] = (
+            semantic_state
+        )
+
+        observables["meta_state"] = (
+            meta_state
+        )
+
+        observables["role"] = role
+
+        observables["memory_average"] = (
+            float(memory_average)
         )
 
         observables["noise_strength"] = (
             float(detector["noise"])
+        )
+
+        observables["global_load"] = (
+            float(global_load)
         )
 
         observables["step"] = step
@@ -157,12 +248,21 @@ for step in range(30):
             observables
         )
 
+        role_history.append(
+            {
+                "detector": detector_id,
+                "step": step,
+                "role": role
+            }
+        )
+
         print(
             f"Detector {detector_id} | "
-            f"Role: {detector['role']} | "
+            f"Role: {role} | "
+            f"Semantic: {semantic_state} | "
+            f"Meta: {meta_state} | "
             f"Noise: "
-            f"{detector['noise']:.4f} | "
-            f"Peaks: {peak_count}"
+            f"{detector['noise']:.4f}"
         )
 
 # ----------------------------------------
@@ -173,13 +273,13 @@ plt.figure(figsize=(14, 8))
 
 for detector_id in history:
 
-    peak_history = [
-        h["peak_count"]
+    noise_history = [
+        h["noise_strength"]
         for h in history[detector_id]
     ]
 
     plt.plot(
-        peak_history,
+        noise_history,
         label=f"Detector {detector_id}"
     )
 
@@ -189,7 +289,7 @@ plt.title(
 
 plt.xlabel("Evolution Step")
 
-plt.ylabel("Peak Count")
+plt.ylabel("Noise Strength")
 
 plt.grid(True)
 
@@ -213,6 +313,11 @@ print(
 # SAVE TELEMETRY
 # ----------------------------------------
 
+telemetry = {
+    "detectors": history,
+    "role_history": role_history
+}
+
 telemetry_output = (
     f"{session['session_path']}/"
     "autonomous_telemetry.json"
@@ -221,7 +326,7 @@ telemetry_output = (
 with open(telemetry_output, "w") as f:
 
     json.dump(
-        history,
+        telemetry,
         f,
         indent=4
     )
