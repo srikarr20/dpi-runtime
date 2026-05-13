@@ -5,6 +5,15 @@ import matplotlib.pyplot as plt
 from core.telemetry.observables import extract_observables
 from core.telemetry.schema import build_telemetry_event
 from core.trajectory.trajectory import append_observables
+from core.session.session import create_runtime_session
+
+# ----------------------------------------
+# CREATE SESSION
+# ----------------------------------------
+
+session = create_runtime_session()
+
+print(f"Runtime Session: {session['session_id']}")
 
 # ----------------------------------------
 # DPI HELLO WORLD
@@ -28,7 +37,9 @@ print("Generating source field...")
 
 source_center = 0
 
-source_field = np.exp(-(detector_x - source_center)**2 / 20)
+source_field = np.exp(
+    -(detector_x - source_center)**2 / 20
+)
 
 # ----------------------------------------
 # COHERENCE MODULATION
@@ -68,10 +79,12 @@ observables = extract_observables(
 )
 
 # ----------------------------------------
-# BUILD STRUCTURED TELEMETRY
+# STRUCTURED TELEMETRY
 # ----------------------------------------
 
-telemetry_event = build_telemetry_event(observables)
+telemetry_event = build_telemetry_event(
+    observables
+)
 
 # ----------------------------------------
 # PRINT OBSERVABLES
@@ -80,13 +93,17 @@ telemetry_event = build_telemetry_event(observables)
 print("\n--- OBSERVABILITY METRICS ---")
 
 for key, value in observables.items():
+
     print(f"{key}: {value}")
 
 # ----------------------------------------
-# SAVE OBSERVABLES
+# SAVE TELEMETRY
 # ----------------------------------------
 
-metrics_output = "outputs/telemetry/observables.json"
+metrics_output = (
+    f"{session['session_path']}/"
+    "observables.json"
+)
 
 with open(metrics_output, "w") as f:
 
@@ -96,7 +113,10 @@ with open(metrics_output, "w") as f:
         indent=4
     )
 
-print(f"\nSaved observability metrics: {metrics_output}")
+print(
+    f"\nSaved observability metrics: "
+    f"{metrics_output}"
+)
 
 # ----------------------------------------
 # UPDATE TRAJECTORY HISTORY
@@ -105,11 +125,16 @@ print(f"\nSaved observability metrics: {metrics_output}")
 append_observables(observables)
 
 # ----------------------------------------
-# SAVE NUMERICAL OUTPUT
+# SAVE RAW ARRAY
 # ----------------------------------------
 
+raw_output = (
+    f"{session['session_path']}/"
+    "raw_detector_observability.npy"
+)
+
 np.save(
-    "outputs/raw/raw_detector_observability.npy",
+    raw_output,
     intensity
 )
 
@@ -125,11 +150,16 @@ plt.plot(
     label="Detector Observability"
 )
 
-plt.title("DPI Hello World — Detector Plane Observability")
+plt.title(
+    "DPI Hello World — "
+    "Detector Plane Observability"
+)
 
 plt.xlabel("Detector Position")
 
-plt.ylabel("Normalized Observability Intensity")
+plt.ylabel(
+    "Normalized Observability Intensity"
+)
 
 plt.grid(True)
 
@@ -138,10 +168,14 @@ plt.grid(True)
 # ----------------------------------------
 
 metrics_text = (
-    f"Peak Intensity: {observables['peak_intensity']:.2f}\n"
-    f"Mean Intensity: {observables['mean_intensity']:.4f}\n"
-    f"Coherence Width: {observables['coherence_width']:.2f}\n"
-    f"Peak Count: {observables['peak_count']}"
+    f"Peak Intensity: "
+    f"{observables['peak_intensity']:.2f}\n"
+    f"Mean Intensity: "
+    f"{observables['mean_intensity']:.4f}\n"
+    f"Coherence Width: "
+    f"{observables['coherence_width']:.2f}\n"
+    f"Peak Count: "
+    f"{observables['peak_count']}"
 )
 
 plt.text(
@@ -150,7 +184,10 @@ plt.text(
     metrics_text,
     transform=plt.gca().transAxes,
     verticalalignment='top',
-    bbox=dict(facecolor='white', alpha=0.8)
+    bbox=dict(
+        facecolor='white',
+        alpha=0.8
+    )
 )
 
 plt.legend()
@@ -159,11 +196,17 @@ plt.legend()
 # SAVE IMAGE
 # ----------------------------------------
 
-output_image = "outputs/images/dpi_hello_world.png"
+image_output = (
+    f"{session['session_path']}/"
+    "dpi_hello_world.png"
+)
 
-plt.savefig(output_image)
+plt.savefig(image_output)
 
-print(f"Saved detector-plane image: {output_image}")
+print(
+    f"Saved detector-plane image: "
+    f"{image_output}"
+)
 
 plt.close()
 
