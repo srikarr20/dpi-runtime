@@ -18,12 +18,36 @@ from diplomacy.diplomacy_engine import (
     DiplomacyEngine
 )
 
+from governance.governance_engine import (
+    GovernanceEngine
+)
+
+from inheritance.inheritance_engine import (
+    InheritanceEngine
+)
+
+from constitution.constitutional_engine import (
+    ConstitutionalEngine
+)
+
+from metagovernance.metagovernance_engine import (
+    MetaGovernanceEngine
+)
+
+from observer.observer_engine import (
+    ObserverEngine
+)
+
+from integrator.quantum_integrator import (
+    QuantumIntegrator
+)
+
 # --------------------------------------------------
 # INITIALIZATION
 # --------------------------------------------------
 
 print(
-    "\nRecursive Civilization Runtime Initializing...\n"
+    "\nQuantum Integrator Runtime Initializing...\n"
 )
 
 # --------------------------------------------------
@@ -57,8 +81,6 @@ topology = TopologyGraph(
     connectivity=0.20
 )
 
-topology.summary()
-
 # --------------------------------------------------
 # REGIONS
 # --------------------------------------------------
@@ -67,8 +89,6 @@ regions = CivilizationRegions(
     detectors,
     num_regions=4
 )
-
-regions.summary()
 
 # --------------------------------------------------
 # DIPLOMACY
@@ -79,22 +99,71 @@ diplomacy = DiplomacyEngine(
 )
 
 # --------------------------------------------------
+# GOVERNANCE
+# --------------------------------------------------
+
+governance = GovernanceEngine(
+    regions
+)
+
+# --------------------------------------------------
+# INHERITANCE
+# --------------------------------------------------
+
+inheritance = InheritanceEngine(
+    regions
+)
+
+# --------------------------------------------------
+# CONSTITUTION
+# --------------------------------------------------
+
+constitution = ConstitutionalEngine(
+    governance
+)
+
+# --------------------------------------------------
+# META GOVERNANCE
+# --------------------------------------------------
+
+metagovernance = MetaGovernanceEngine(
+    governance,
+    constitution
+)
+
+# --------------------------------------------------
+# OBSERVER ENGINE
+# --------------------------------------------------
+
+observer = ObserverEngine(
+    governance,
+    metagovernance
+)
+
+# --------------------------------------------------
+# QUANTUM INTEGRATOR
+# --------------------------------------------------
+
+integrator = QuantumIntegrator(
+    regions,
+    observer
+)
+
+# --------------------------------------------------
 # TRACKING
 # --------------------------------------------------
 
 coherence_history = []
-
-alliance_history = []
+observer_history = []
+integrator_history = []
 
 # --------------------------------------------------
 # MAIN LOOP
 # --------------------------------------------------
 
-for epoch in range(200):
+for epoch in range(700):
 
-    print(
-        f"\nEpoch {epoch}"
-    )
+    print(f"\nEpoch {epoch}")
 
     federation.update_global_field()
 
@@ -102,9 +171,34 @@ for epoch in range(200):
 
     diplomacy.update_relations()
 
+    governance.update_governance()
+
+    inheritance.archive_epoch()
+
+    constitution.evolve_constitutions()
+
+    metagovernance.evaluate_systems()
+
+    metagovernance.regulate_constitutions()
+
+    observer.observe_systems()
+
+    observer.recursive_feedback()
+
+    integrator.integrate_fields()
+
+    integrator.distribute_feedback(
+        detectors
+    )
+
+    integrator_coherence = (
+        integrator
+        .compute_integrator_coherence()
+    )
+
     epoch_coherence = []
 
-    alliance_scores = []
+    observer_scores = []
 
     # ----------------------------------------------
     # DETECTOR EVOLUTION
@@ -120,15 +214,26 @@ for epoch in range(200):
             ]
         )
 
+        heritage_field = (
+            inheritance.retrieve_heritage(
+                region
+            )
+        )
+
+        combined_field = (
+            0.7 * regional_field
+            + 0.3 * heritage_field
+        )
+
         d.update_prediction()
 
         d.update_semantic_state(
-            regional_field
+            combined_field
         )
 
         coherence = (
             d.compute_coherence(
-                regional_field
+                combined_field
             )
         )
 
@@ -137,7 +242,7 @@ for epoch in range(200):
         )
 
         # ------------------------------------------
-        # TOPOLOGY
+        # TRUST TOPOLOGY
         # ------------------------------------------
 
         neighbor_ids = topology.get_neighbors(
@@ -168,19 +273,22 @@ for epoch in range(200):
                 other.id
             ] = trust
 
-        # ------------------------------------------
-        # MEMORY
-        # ------------------------------------------
-
         d.memory.append(
             d.semantic_state.tolist()
         )
 
-        # ------------------------------------------
-        # MIGRATION
-        # ------------------------------------------
+        policy = governance.policies[
+            region
+        ]
 
-        if random.random() < 0.01:
+        migration_rate = (
+            1.0
+            - policy[
+                "migration_control"
+            ]
+        ) * 0.02
+
+        if random.random() < migration_rate:
 
             target = random.choice(
                 list(
@@ -194,67 +302,71 @@ for epoch in range(200):
             )
 
     # ----------------------------------------------
-    # COHERENCE
+    # AGGREGATE METRICS
     # ----------------------------------------------
-
-    coherence = float(
-        np.mean(epoch_coherence)
-    )
 
     coherence_history.append(
-        coherence
+        float(
+            np.mean(epoch_coherence)
+        )
+    )
+
+    observer_scores = list(
+        observer.observer_fields.values()
+    )
+
+    observer_history.append(
+        float(
+            np.mean(observer_scores)
+        )
+    )
+
+    integrator_history.append(
+        integrator_coherence
     )
 
     # ----------------------------------------------
-    # DIPLOMATIC ALLIANCES
+    # LOGGING
     # ----------------------------------------------
 
-    for region, relations in (
-        diplomacy.alliances.items()
-    ):
-
-        for other, score in (
-            relations.items()
-        ):
-
-            alliance_scores.append(score)
-
-    avg_alliance = float(
-        np.mean(alliance_scores)
-    )
-
-    alliance_history.append(
-        avg_alliance
+    print(
+        f"Coherence: "
+        f"{coherence_history[-1]:.4f}"
     )
 
     print(
-        f"Federation Coherence: "
-        f"{coherence:.4f}"
+        f"Observer Stability: "
+        f"{observer_history[-1]:.4f}"
     )
 
     print(
-        f"Alliance Stability: "
-        f"{avg_alliance:.4f}"
+        f"Integrator Coherence: "
+        f"{integrator_coherence:.4f}"
     )
 
 # --------------------------------------------------
 # VISUALIZATION
 # --------------------------------------------------
 
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(14, 7))
 
 plt.plot(
     coherence_history,
-    label="Coherence"
+    label="Detector Coherence"
 )
 
 plt.plot(
-    alliance_history,
-    label="Alliance Stability"
+    observer_history,
+    label="Observer Stability"
+)
+
+plt.plot(
+    integrator_history,
+    label="Integrator Coherence"
 )
 
 plt.title(
-    "Civilization Diplomacy Dynamics"
+    "Quantum Integrator Runtime"
 )
 
 plt.xlabel("Epoch")
@@ -267,15 +379,15 @@ plt.legend()
 
 plt.savefig(
     "dpi-runtime-phase9/telemetry/"
-    "civilization_diplomacy.png"
+    "quantum_integrator.png"
 )
 
 plt.close()
 
 print(
-    "\nSaved diplomacy plot."
+    "\nSaved quantum integrator plot."
 )
 
 print(
-    "\nRecursive Civilization Runtime Complete.\n"
+    "\nQuantum Integrator Runtime Complete.\n"
 )
