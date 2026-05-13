@@ -1,7 +1,9 @@
-cat > README.md << 'EOF'
+
 # DPI Runtime
 
-Detector-Plane Observability Runtime
+DPI = Detector-Plane Imaging / Detector-Plane Observability
+
+Experimental observability runtime for detector-plane coherence analysis, trajectory evolution, and runtime telemetry.
 
 ---
 
@@ -39,6 +41,21 @@ Rather than focusing only on isolated detector outcomes, the runtime analyzes:
 - trajectory evolution
 - semantic state regions
 - runtime anomaly behavior
+
+---
+
+# Runtime Pipeline
+
+The current runtime pipeline follows:
+
+Detector Plane
+→ Observability Extraction
+→ Telemetry Persistence
+→ Trajectory Evolution
+→ Interlock Analysis
+→ Forecasting
+
+The system treats detector-plane behavior as a structured observability environment rather than a simple terminal measurement surface.
 
 ---
 
