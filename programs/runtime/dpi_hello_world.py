@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from core.telemetry.observables import extract_observables
+from core.telemetry.schema import build_telemetry_event
 from core.trajectory.trajectory import append_observables
 
 # ----------------------------------------
@@ -67,6 +68,12 @@ observables = extract_observables(
 )
 
 # ----------------------------------------
+# BUILD STRUCTURED TELEMETRY
+# ----------------------------------------
+
+telemetry_event = build_telemetry_event(observables)
+
+# ----------------------------------------
 # PRINT OBSERVABLES
 # ----------------------------------------
 
@@ -84,7 +91,7 @@ metrics_output = "outputs/telemetry/observables.json"
 with open(metrics_output, "w") as f:
 
     json.dump(
-        observables,
+        telemetry_event.model_dump(),
         f,
         indent=4
     )
