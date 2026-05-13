@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-TRAJECTORY_FILE = "outputs/trajectory_history.json"
+TRAJECTORY_FILE = "outputs/telemetry/trajectory_history.json"
 
 def append_observables(observables):
 
