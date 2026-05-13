@@ -5,6 +5,8 @@ from pathlib import Path
 
 import json
 
+from core.registry.registry import append_session
+
 
 def create_runtime_session():
 
@@ -39,9 +41,13 @@ def create_runtime_session():
             indent=4
         )
 
-    return {
+    session_metadata = {
         "session_id": session_id,
         "timestamp": timestamp,
         "session_path": str(session_path),
         "manifest_path": str(manifest_path)
     }
+
+    append_session(session_metadata)
+
+    return session_metadata
