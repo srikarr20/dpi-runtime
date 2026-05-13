@@ -14,6 +14,10 @@ from topology.civilization_regions import (
     CivilizationRegions
 )
 
+from diplomacy.diplomacy_engine import (
+    DiplomacyEngine
+)
+
 # --------------------------------------------------
 # INITIALIZATION
 # --------------------------------------------------
@@ -56,7 +60,7 @@ topology = TopologyGraph(
 topology.summary()
 
 # --------------------------------------------------
-# CIVILIZATION REGIONS
+# REGIONS
 # --------------------------------------------------
 
 regions = CivilizationRegions(
@@ -67,16 +71,26 @@ regions = CivilizationRegions(
 regions.summary()
 
 # --------------------------------------------------
+# DIPLOMACY
+# --------------------------------------------------
+
+diplomacy = DiplomacyEngine(
+    regions
+)
+
+# --------------------------------------------------
 # TRACKING
 # --------------------------------------------------
 
 coherence_history = []
 
+alliance_history = []
+
 # --------------------------------------------------
 # MAIN LOOP
 # --------------------------------------------------
 
-for epoch in range(150):
+for epoch in range(200):
 
     print(
         f"\nEpoch {epoch}"
@@ -86,7 +100,11 @@ for epoch in range(150):
 
     regions.update_region_fields()
 
+    diplomacy.update_relations()
+
     epoch_coherence = []
+
+    alliance_scores = []
 
     # ----------------------------------------------
     # DETECTOR EVOLUTION
@@ -187,9 +205,36 @@ for epoch in range(150):
         coherence
     )
 
+    # ----------------------------------------------
+    # DIPLOMATIC ALLIANCES
+    # ----------------------------------------------
+
+    for region, relations in (
+        diplomacy.alliances.items()
+    ):
+
+        for other, score in (
+            relations.items()
+        ):
+
+            alliance_scores.append(score)
+
+    avg_alliance = float(
+        np.mean(alliance_scores)
+    )
+
+    alliance_history.append(
+        avg_alliance
+    )
+
     print(
         f"Federation Coherence: "
         f"{coherence:.4f}"
+    )
+
+    print(
+        f"Alliance Stability: "
+        f"{avg_alliance:.4f}"
     )
 
 # --------------------------------------------------
@@ -199,28 +244,36 @@ for epoch in range(150):
 plt.figure(figsize=(12, 6))
 
 plt.plot(
-    coherence_history
+    coherence_history,
+    label="Coherence"
+)
+
+plt.plot(
+    alliance_history,
+    label="Alliance Stability"
 )
 
 plt.title(
-    "Civilization Region Coherence"
+    "Civilization Diplomacy Dynamics"
 )
 
 plt.xlabel("Epoch")
 
-plt.ylabel("Coherence")
+plt.ylabel("Metric")
 
 plt.grid(True)
 
+plt.legend()
+
 plt.savefig(
     "dpi-runtime-phase9/telemetry/"
-    "civilization_regions.png"
+    "civilization_diplomacy.png"
 )
 
 plt.close()
 
 print(
-    "\nSaved civilization regions plot."
+    "\nSaved diplomacy plot."
 )
 
 print(
