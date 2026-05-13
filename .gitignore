@@ -13,3 +13,16 @@ outputs/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Virtual Environment
+.venv/
+
+# macOS
+.DS_Store
+
+# Runtime Outputs
+outputs/
+
+# Python Cache
+__pycache__/
+*.pyc
