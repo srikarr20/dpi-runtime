@@ -20,6 +20,10 @@ from core.session.session import (
     create_runtime_session
 )
 
+from core.predictive.predictor import (
+    predict_future_state
+)
+
 # ----------------------------------------
 # SESSION
 # ----------------------------------------
@@ -135,10 +139,6 @@ for step in range(200):
         detectors.keys()
     )
 
-    # ----------------------------------------
-    # DETECTOR EVOLUTION
-    # ----------------------------------------
-
     for detector_id in current_ids:
 
         if detector_id not in detectors:
@@ -196,6 +196,16 @@ for step in range(200):
         )
 
         # ----------------------------------------
+        # FUTURE PREDICTION
+        # ----------------------------------------
+
+        future_state = (
+            predict_future_state(
+                detector
+            )
+        )
+
+        # ----------------------------------------
         # TRUST UPDATE
         # ----------------------------------------
 
@@ -219,6 +229,24 @@ for step in range(200):
         # entropy drift
 
         detector["trust"] *= 0.995
+
+        # ----------------------------------------
+        # PREDICTIVE ADAPTATION
+        # ----------------------------------------
+
+        if future_state == "collapse":
+
+            detector["noise"] *= 0.95
+
+            detector["energy"] += 0.02
+
+        elif future_state == "fragile":
+
+            detector["noise"] *= 0.98
+
+        elif future_state == "dominant":
+
+            detector["energy"] += 0.01
 
         # ----------------------------------------
         # REPRODUCTION
@@ -311,7 +339,8 @@ for step in range(200):
                 "energy": detector[
                     "energy"
                 ],
-                "semantic": semantic_state
+                "semantic": semantic_state,
+                "future_state": future_state
             }
         )
 
@@ -326,7 +355,9 @@ for step in range(200):
             f"Age: "
             f"{detector['age']} | "
             f"Energy: "
-            f"{detector['energy']:.2f}"
+            f"{detector['energy']:.2f} | "
+            f"Future: "
+            f"{future_state}"
         )
 
     population_sizes.append(
@@ -349,7 +380,7 @@ plt.plot(
 )
 
 plt.title(
-    "Evolutionary DPI Ecology"
+    "Recursive Predictive DPI Ecology"
 )
 
 plt.xlabel("Evolution Step")
@@ -360,7 +391,7 @@ plt.grid(True)
 
 output_path = (
     f"{session['session_path']}/"
-    "evolutionary_runtime.png"
+    "predictive_ecology.png"
 )
 
 plt.savefig(output_path)
@@ -368,7 +399,7 @@ plt.savefig(output_path)
 plt.close()
 
 print(
-    f"\nSaved evolutionary runtime: "
+    f"\nSaved predictive ecology: "
     f"{output_path}"
 )
 
@@ -378,7 +409,7 @@ print(
 
 telemetry_output = (
     f"{session['session_path']}/"
-    "evolutionary_telemetry.json"
+    "predictive_telemetry.json"
 )
 
 with open(telemetry_output, "w") as f:
@@ -395,5 +426,5 @@ print(
 )
 
 print(
-    "\nEvolutionary DPI Runtime Complete."
+    "\nRecursive Predictive DPI Runtime Complete."
 )
