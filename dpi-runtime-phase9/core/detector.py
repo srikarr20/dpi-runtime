@@ -1,90 +1,66 @@
-import uuid
 import numpy as np
 
+class Detector:
 
-class RecursiveDetector:
+    def __init__(
+        self,
+        detector_id
+    ):
 
-    def __init__(self, semantic_dim=128):
+        self.id = detector_id
 
-        self.id = str(uuid.uuid4())
+        self.semantic_state = (
+            np.random.rand(16)
+        )
 
-        self.semantic_state = np.random.randn(semantic_dim)
-
-        self.semantic_state /= np.linalg.norm(
-            self.semantic_state
+        self.prediction = (
+            np.random.rand(16)
         )
 
         self.trust_map = {}
 
         self.memory = []
 
-        self.prediction_field = np.zeros(semantic_dim)
+    # ------------------------------------------
 
-        self.coherence = 1.0
+    def update_prediction(self):
 
-    def observe(self, signal):
-
-        imprint = signal + np.random.normal(
+        drift = np.random.normal(
             0,
-            0.01,
-            len(signal)
+            0.02,
+            16
         )
 
-        self.semantic_state += imprint
+        self.prediction += drift
 
-        self.semantic_state /= np.linalg.norm(
-            self.semantic_state
-        )
+    # ------------------------------------------
 
-        self.memory.append(imprint.tolist())
-
-        return imprint
-
-    def predict(self):
-
-        prediction = (
-            self.semantic_state
-            + self.prediction_field
-        )
-
-        prediction /= np.linalg.norm(prediction)
-
-        return prediction
-
-    def update_prediction_field(
+    def update_semantic_state(
         self,
         federation_field
     ):
 
-        self.prediction_field = (
-            0.8 * self.prediction_field
-            + 0.2 * federation_field
+        delta = (
+            federation_field
+            - self.semantic_state
         )
 
-    def compute_coherence(self, other):
-
-        return float(
-            np.dot(
-                self.semantic_state,
-                other.semantic_state
-            )
+        self.semantic_state += (
+            0.05 * delta
         )
 
-    def trust_update(
+    # ------------------------------------------
+
+    def compute_coherence(
         self,
-        other_id,
-        coherence
+        federation_field
     ):
 
-        if other_id not in self.trust_map:
-            self.trust_map[other_id] = 0.5
-
-        self.trust_map[other_id] += (
-            0.01 * coherence
-        )
-
-        self.trust_map[other_id] = np.clip(
-            self.trust_map[other_id],
-            0.0,
-            1.0
+        return float(
+            np.mean(
+                np.abs(
+                    federation_field
+                    - self.semantic_state
+                )
+            )
         )

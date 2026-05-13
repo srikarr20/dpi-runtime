@@ -1,95 +1,196 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
-from core.detector import RecursiveDetector
+from core.detector import Detector
 
-from federation.federation import (
-    DetectorFederation
+from federation.federation import Federation
+
+from topology.topology_graph import (
+    TopologyGraph
 )
 
-from consensus.consensus import (
-    RecursiveConsensusEngine
+# --------------------------------------------------
+# INITIALIZATION
+# --------------------------------------------------
+
+print(
+    "\nRecursive Civilization Runtime Initializing...\n"
 )
 
-from prediction.predictive_field import (
-    CooperativePredictionField
-)
+# --------------------------------------------------
+# DETECTORS
+# --------------------------------------------------
 
-from trust.trust_ecology import (
-    TrustEcology
-)
+detectors = []
 
-from memory.distributed_memory import (
-    DistributedSemanticMemory
-)
+for i in range(25):
 
-# =====================================================
-# INITIALIZE DETECTORS
-# =====================================================
+    detectors.append(
+        Detector(
+            detector_id=f"D{i}"
+        )
+    )
 
-detectors = [
-    RecursiveDetector()
-    for _ in range(20)
-]
-
-# =====================================================
+# --------------------------------------------------
 # FEDERATION
-# =====================================================
+# --------------------------------------------------
 
-federation = DetectorFederation(
+federation = Federation(
     detectors
 )
 
-consensus = RecursiveConsensusEngine(
-    federation
+# --------------------------------------------------
+# TOPOLOGY
+# --------------------------------------------------
+
+topology = TopologyGraph(
+    detectors,
+    connectivity=0.25
 )
 
-prediction_field = (
-    CooperativePredictionField()
-)
+topology.summary()
 
-trust_ecology = TrustEcology(
-    federation
-)
+# --------------------------------------------------
+# TRACKING
+# --------------------------------------------------
 
-memory = DistributedSemanticMemory()
+coherence_history = []
 
-# =====================================================
-# RUNTIME LOOP
-# =====================================================
+# --------------------------------------------------
+# MAIN LOOP
+# --------------------------------------------------
 
-for epoch in range(1000):
+for epoch in range(100):
 
-    signal = np.random.randn(128)
-
-    for detector in detectors:
-
-        detector.observe(signal)
-
-        memory.store(
-            detector.id,
-            detector.semantic_state
-        )
-
-    federation.synchronize_predictions()
-
-    trust_ecology.evolve()
-
-    consensus.stabilize()
-
-    field = prediction_field.generate(
-        federation
+    print(
+        f"\nEpoch {epoch}"
     )
 
-    coherence = (
-        federation.federation_coherence()
+    federation.update_global_field()
+
+    field = federation.global_field
+
+    epoch_coherence = []
+
+    # ----------------------------------------------
+    # DETECTOR EVOLUTION
+    # ----------------------------------------------
+
+    for d in detectors:
+
+        d.update_prediction()
+
+        d.update_semantic_state(
+            field
+        )
+
+        coherence = (
+            d.compute_coherence(
+                field
+            )
+        )
+
+        epoch_coherence.append(
+            coherence
+        )
+
+        # ------------------------------------------
+        # TOPOLOGY NEIGHBORS
+        # ------------------------------------------
+
+        neighbor_ids = topology.get_neighbors(
+            d.id
+        )
+
+        # ------------------------------------------
+        # TRUST DYNAMICS
+        # ------------------------------------------
+
+        for other in detectors:
+
+            if other.id not in neighbor_ids:
+
+                continue
+
+            similarity = float(
+                np.mean(
+                    np.abs(
+                        d.semantic_state
+                        - other.semantic_state
+                    )
+                )
+            )
+
+            trust = max(
+                0.0,
+                1.0 - similarity
+            )
+
+            d.trust_map[
+                other.id
+            ] = trust
+
+        # ------------------------------------------
+        # MEMORY
+        # ------------------------------------------
+
+        d.memory.append(
+            d.semantic_state.tolist()
+        )
+
+    # ----------------------------------------------
+    # COHERENCE
+    # ----------------------------------------------
+
+    coherence = float(
+        np.mean(epoch_coherence)
+    )
+
+    coherence_history.append(
+        coherence
     )
 
     print(
-        f"[epoch {epoch}] "
-        f"coherence={coherence:.4f}"
+        f"Federation Coherence: "
+        f"{coherence:.4f}"
     )
 
-print("")
-print("===================================")
-print("COLLECTIVE INTELLIGENCE STABILIZED")
-print("===================================")
+# --------------------------------------------------
+# VISUALIZATION
+# --------------------------------------------------
+
+plt.figure(figsize=(12, 6))
+
+plt.plot(
+    coherence_history
+)
+
+plt.title(
+    "Civilization Coherence Evolution"
+)
+
+plt.xlabel("Epoch")
+
+plt.ylabel("Coherence")
+
+plt.grid(True)
+
+plt.savefig(
+    "dpi-runtime-phase9/telemetry/"
+    "civilization_coherence.png"
+)
+
+plt.close()
+
+print(
+    "\nSaved civilization coherence plot:"
+)
+
+print(
+    "dpi-runtime-phase9/telemetry/"
+    "civilization_coherence.png"
+)
+
+print(
+    "\nRecursive Civilization Runtime Complete.\n"
+)
