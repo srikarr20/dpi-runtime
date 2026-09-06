@@ -1,126 +1,318 @@
-
 # DPI Runtime
 
-DPI = Detector-Plane Imaging / Detector-Plane Observability
+**Experimental detector-plane observability runtime**
 
-Experimental observability runtime for detector-plane coherence analysis, trajectory evolution, and runtime telemetry.
+DPI Runtime explores how detector-plane measurements can be transformed into
+structured observables, telemetry, evolving measurement states, trajectories,
+classification, prediction, interlocks, and adaptive runtime responses.
 
----
-
-# Overview
-
-DPI Runtime is an experimental observability framework for studying detector-plane coherence structure, observability vectors, trajectory evolution, and runtime telemetry.
-
-The system models detector-plane observability as a structured runtime environment rather than a simple terminal measurement surface.
-
-The runtime currently supports:
-
-- detector-plane simulation
-- observability vector extraction
-- calibration states
-- trajectory accumulation
-- manifold projection
-- anomaly/interlock detection
-- semantic trajectory regions
-- predictive trajectory forecasting
+It extends Detector-Plane Imaging research from static measurement
+representation toward stateful measurement observability.
 
 ---
 
-# Architecture Philosophy
+## Core Research Pipeline
 
-The runtime treats the detector plane as:
-
-- an observability surface
-- a telemetry generation layer
-- a coherence-state measurement environment
-
-Rather than focusing only on isolated detector outcomes, the runtime analyzes:
-
-- observability geometry
-- coherence degradation
-- trajectory evolution
-- semantic state regions
-- runtime anomaly behavior
-
----
-
-# Runtime Pipeline
-
-The current runtime pipeline follows:
-
-Detector Plane
-→ Observability Extraction
-→ Telemetry Persistence
-→ Trajectory Evolution
-→ Interlock Analysis
-→ Forecasting
-
-The system treats detector-plane behavior as a structured observability environment rather than a simple terminal measurement surface.
+~~~text
+Detector-Plane Signal
+        ↓
+Observable Extraction
+        ↓
+Structured Telemetry
+        ↓
+Session Persistence
+        ↓
+Trajectory Accumulation
+        ↓
+Calibration
+        ↓
+Phase-Space Representation
+        ↓
+Regime Classification
+        ↓
+Predictive Observability
+        ↓
+Interlock Detection
+        ↓
+Adaptive Runtime Response
+~~~
 
 ---
 
-# Current Runtime Capabilities
+## Core Observables
 
-## Detector-Plane Runtime
-
-Generate detector-plane intensity structures and observability fields.
-
-## Observability Telemetry
-
-Extract structured observability metrics including:
+The runtime currently extracts:
 
 - peak intensity
 - mean intensity
+- intensity variance
+- center of mass
 - coherence width
-- variance
 - peak count
+- noise strength
 
-## Calibration States
+Core implementation:
 
-Generate controlled runtime states:
+~~~text
+core/telemetry/
+├── observables.py
+└── schema.py
+~~~
+
+---
+
+## Telemetry and Reproducibility
+
+Runtime measurements are stored as structured telemetry and organized into
+reproducible sessions.
+
+Implemented capabilities include:
+
+- typed telemetry events
+- session identifiers
+- session manifests
+- session registry
+- trajectory persistence
+- session replay
+- session comparison
+
+~~~text
+core/
+├── telemetry/
+├── session/
+├── registry/
+├── replay/
+└── trajectory/
+~~~
+
+---
+
+## Calibration
+
+Controlled detector-plane states are used to establish reference observability
+signatures.
+
+Current experimental calibration states:
 
 - coherent
 - noisy
 - decoherent
 - collapsed
 
-## Trajectory Geometry
+Program:
 
-Project observability vectors into manifold space using PCA.
-
-## Interlock Layer
-
-Detect coherence degradation using observability thresholds.
-
-## Predictive Forecasting
-
-Estimate future trajectory drift using manifold evolution.
+~~~text
+programs/calibration/dpi_state_calibration.py
+~~~
 
 ---
 
-# Project Structure
+## State-Space and Trajectory Analysis
 
-```text
-core/
-    runtime/
-    telemetry/
-    trajectory/
-    interlock/
-    visualization/
+Repeated observability vectors are treated as evolving trajectories through a
+measurement-state space.
 
-programs/
-    runtime/
-    calibration/
-    analysis/
-    interlock/
-    benchmarks/
+Research programs explore:
 
-outputs/
-    images/
-    telemetry/
-    trajectories/
-    raw/
-    sessions/
+- phase-space maps
+- trajectory geometry
+- trajectory dynamics
+- trajectory evolution
+- trajectory-region classification
+- trajectory forecasting
 
-docs/
-tools/
+~~~text
+programs/analysis/
+~~~
+
+---
+
+## Regime Classification
+
+The repository explores multiple forms of measurement-state classification,
+including:
+
+- rule-based semantic states
+- observability-region classification
+- KMeans clustering of phase-space variables
+
+These are experimental classification approaches rather than universal
+physical-state labels.
+
+---
+
+## Predictive Observability
+
+The runtime explores two predictive directions:
+
+1. prediction of future observability regimes;
+2. extrapolation of future measurement trajectories.
+
+The current predictive experiments operate on controlled simulated
+observability data.
+
+---
+
+## Interlock Layer
+
+Calibration-derived baselines are used to detect measurement-state anomalies
+including:
+
+- coherence-width drift
+- peak-count instability
+- intensity-variance collapse
+
+Program:
+
+~~~text
+programs/interlock/dpi_interlock_demo.py
+~~~
+
+---
+
+## Adaptive Runtime
+
+The adaptive runtime closes an experimental feedback loop:
+
+~~~text
+Measurement
+→ Observables
+→ Runtime Assessment
+→ Parameter Adaptation
+→ New Measurement
+~~~
+
+Program:
+
+~~~text
+programs/runtime/dpi_adaptive_runtime.py
+~~~
+
+---
+
+## Runtime Experiments
+
+The research later expanded into increasingly complex runtime experiments:
+
+- dynamic
+- adaptive
+- semantic
+- cognitive
+- meta
+- autonomous
+- cooperative
+- distributed
+- hierarchical
+- evolutionary
+
+These experiments remain under:
+
+~~~text
+programs/runtime/
+~~~
+
+They are retained as research extensions rather than treated as equivalent to
+the foundational runtime core.
+
+---
+
+## Phase 9–11 Systems Research
+
+Later systems-level experiments are preserved separately under:
+
+~~~text
+research/phase9-11/
+~~~
+
+This research explored:
+
+- detector federations
+- topology
+- regional organization
+- distributed semantic memory
+- recursive consensus
+- trust ecology
+- governance
+- constitutional evolution
+- inheritance
+- diplomacy
+- meta-governance
+- observer feedback
+- field integration
+
+See:
+
+~~~text
+research/phase9-11/README.md
+~~~
+
+---
+
+## Repository Structure
+
+~~~text
+dpi-runtime/
+├── core/
+├── programs/
+├── research/
+│   └── phase9-11/
+├── docs/
+│   ├── BLUEPRINT.md
+│   └── VERIFICATION.md
+├── tools/
+├── requirements.txt
+└── README.md
+~~~
+
+---
+
+## Verification
+
+The cleaned core research pipeline was executed successfully on 2026-09-06.
+
+Verified stages:
+
+1. detector observability and telemetry
+2. calibration
+3. phase-space generation
+4. regime classification
+5. predictive observability
+6. observability interlocks
+7. adaptive runtime response
+
+See:
+
+~~~text
+docs/VERIFICATION.md
+~~~
+
+---
+
+## Research Scope
+
+DPI Runtime is an experimental research framework.
+
+It demonstrates software architectures for:
+
+- detector observability
+- structured measurement telemetry
+- measurement-state tracking
+- trajectory analysis
+- state classification
+- predictive observability
+- anomaly/interlock detection
+- adaptive feedback experiments
+
+It is not presented as a production detector controller or as validation
+against physical hardware.
+
+External and cross-dataset validation belongs to the separate
+`dpi-validation-framework` project.
+
+---
+
+## Related Work
+
+- `detector-plane-imaging` — foundational detector-plane measurement research
+- `dpi-validation-framework` — cross-dataset and empirical validation research
+- `dpi-runtime` — stateful observability and runtime research
